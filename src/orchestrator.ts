@@ -11,20 +11,20 @@ import {
   Transition
 } from './types';
 import { NanoBananaProvider } from './providers/nano-banana';
-import { HailuoProvider } from './providers/hailuo';
+import { VeoProvider } from './providers/veo';
 import { FFmpegAssembler, createFallbackVideo } from './assembly/ffmpeg';
 
 export class VideoOrchestrator {
   private config: VideoConfig;
   private nanoBanana: NanoBananaProvider;
-  private hailuo: HailuoProvider;
+  private veo: VeoProvider;
   private ffmpeg: FFmpegAssembler;
   private projectDir: string;
 
   constructor(config: VideoConfig) {
     this.config = config;
     this.nanoBanana = new NanoBananaProvider();
-    this.hailuo = new HailuoProvider();
+    this.veo = new VeoProvider();
     this.ffmpeg = new FFmpegAssembler();
     this.projectDir = '';
   }
@@ -169,7 +169,7 @@ export class VideoOrchestrator {
       const videoPath = path.join(this.projectDir, 'scenes', `scene_${String(scene.id).padStart(2, '0')}.mp4`);
 
       try {
-        await this.hailuo.generateSceneVideo(
+        await this.veo.generateSceneVideo(
           scene.image_path,
           scene.camera_motion,
           scene.mood,
@@ -177,9 +177,9 @@ export class VideoOrchestrator {
           videoPath
         );
         scene.video_path = videoPath;
-        console.log(`[Orchestrator] Scene ${scene.id} animated`);
+        console.log(`[Orchestrator] Scene ${scene.id} animated with Veo`);
       } catch (error) {
-        console.warn(`[Orchestrator] Hailuo failed for scene ${scene.id}, using Ken Burns fallback`);
+        console.warn(`[Orchestrator] Veo failed for scene ${scene.id}, using Ken Burns fallback`);
         
         try {
           await createFallbackVideo(scene.image_path, videoPath, scene.duration);
@@ -224,7 +224,7 @@ export class VideoOrchestrator {
       storyboard,
       costs: {
         image_generation: this.nanoBanana.getEstimatedCost(storyboard.scenes.length),
-        video_generation: this.hailuo.getEstimatedCost(this.config.duration),
+        video_generation: this.veo.getEstimatedCost(this.config.duration),
         audio_generation: 0,
         total: 0
       },

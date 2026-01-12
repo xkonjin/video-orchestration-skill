@@ -1,11 +1,11 @@
 ---
 name: video-orchestration-pipeline
-description: Orchestrate long-form video generation using AI image generation (Nano Banana Pro), video synthesis (Hailuo 2), and ffmpeg assembly from a single text prompt.
+description: Orchestrate long-form video generation using Google Gemini Nano Banana (image generation), Google Veo (video synthesis), and ffmpeg assembly from a single text prompt.
 ---
 
 # Video Orchestration Pipeline
 
-Generate complete long-form videos from text descriptions using Claude as an orchestration agent that coordinates multiple AI tools.
+Generate complete long-form videos from text descriptions using Claude as an orchestration agent that coordinates Google's AI tools.
 
 ## When to Use
 
@@ -21,8 +21,8 @@ Invoke this skill when the user wants to:
 ```
 [User Prompt] → [Storyboard] → [Images] → [Video Clips] → [Assembly] → [Final Video]
      ↓              ↓             ↓            ↓              ↓
-   Claude      Claude AI    Nano Banana   Hailuo 2.3      ffmpeg
-                            Pro (fal.ai)   (MiniMax)
+   Claude      Claude AI    Gemini/Imagen   Google Veo     ffmpeg
+                            (Nano Banana)    3.1
 ```
 
 ## Pipeline Stages
@@ -52,25 +52,38 @@ Break down the user's concept into discrete scenes with visual descriptions.
 }
 ```
 
-### Stage 2: Image Generation (Nano Banana Pro via fal.ai)
+### Stage 2: Image Generation (Google Gemini Nano Banana / Imagen 4)
 
-**API Endpoint:** `https://fal.run/fal-ai/nano-banana-pro`
+**API Endpoint:** `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent`
+
+**Models Available:**
+- **Gemini 2.5 Flash Image (Nano Banana)** - Fast, multimodal image generation
+- **Gemini 3 Pro Image** - Highest quality, complex compositions
+- **Imagen 4** - Best text rendering, commercial quality
+- **Imagen 4 Ultra** - Maximum detail, 2K resolution
 
 **Features:**
-- Native 4K resolution support
+- Native 4K resolution support (Imagen 4 Ultra)
 - Excellent text rendering for signage
 - Character/subject consistency across frames
 - Commercial-grade quality
 
 **Request Format:**
 ```javascript
-const result = await fal.run("fal-ai/nano-banana-pro", {
-  input: {
-    prompt: "{scene_description}, {style_suffix}",
-    image_size: "landscape_16_9",
-    num_images: 1
+const response = await fetch(
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_API_KEY}`,
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: "{scene_description}, {style_suffix}" }] }],
+      generationConfig: {
+        responseModalities: ['image', 'text'],
+        imageDimension: '1344x768'
+      }
+    })
   }
-});
+);
 ```
 
 **Style Suffixes by Video Type:**
@@ -79,31 +92,46 @@ const result = await fal.run("fal-ai/nano-banana-pro", {
 - **Artistic:** "painterly style, rich colors, dramatic composition"
 - **Social Media:** "vibrant colors, high contrast, eye-catching, vertical format"
 
-### Stage 3: Video Generation (Hailuo 2.3 via MiniMax)
+### Stage 3: Video Generation (Google Veo 3.1)
 
-**API Endpoint:** `https://api.minimax.chat/v1/video_generation`
+**API Endpoint:** `https://{region}-aiplatform.googleapis.com/v1/projects/{project}/locations/{region}/publishers/google/models/veo-3.1-generate-001:predictLongRunning`
+
+**Models Available:**
+- **Veo 3.1** - Latest model, image-to-video support
+- **Veo 3.1 Fast** - Faster generation, same quality
+- **Veo 3.0** - Text-to-video with sound generation
+- **Veo 2.0** - Reference image support
 
 **Capabilities:**
-- Image-to-video with motion prompts
-- 6-10 second clips at 1080p/30fps
-- Camera movement control
+- Image-to-video with motion prompts (Veo 3.1)
+- Text-to-video generation (Veo 3.0)
+- 4, 6, or 8 second clips at 720p/1080p, 24fps
+- Camera movement control via prompts
 - Physics-accurate motion
 
 **Request Format:**
 ```javascript
-const response = await fetch("https://api.minimax.chat/v1/video_generation", {
-  method: "POST",
-  headers: {
-    "Authorization": `Bearer ${MINIMAX_API_KEY}`,
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    model: "video-01",
-    prompt: "{motion_description}",
-    first_frame_image: "{base64_or_url}",
-    duration: 10
-  })
-});
+const response = await fetch(
+  `https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/veo-3.1-generate-001:predictLongRunning`,
+  {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${GOOGLE_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      instances: [{
+        prompt: "{motion_description}",
+        image: { bytesBase64Encoded: "{base64_image}" }
+      }],
+      parameters: {
+        aspectRatio: "16:9",
+        durationSeconds: 8,
+        sampleCount: 1
+      }
+    })
+  }
+);
 ```
 
 **Motion Prompts by Camera Movement:**
@@ -140,8 +168,11 @@ ffmpeg -i video.mp4 -i music.mp3 -i ambient.mp3 \
 
 Environment variables:
 ```bash
-export FAL_KEY="your_fal_ai_key"
-export MINIMAX_API_KEY="your_minimax_key"
+# Required - Google Cloud credentials
+export GOOGLE_API_KEY="your_google_api_key"           # or GEMINI_API_KEY
+export GOOGLE_CLOUD_PROJECT="your_gcp_project_id"
+export GOOGLE_CLOUD_REGION="us-central1"              # optional, defaults to us-central1
+
 # Optional
 export GLIF_API_KEY="your_glif_key"
 export ELEVENLABS_API_KEY="your_elevenlabs_key"
@@ -246,6 +277,7 @@ const result = await glif.run("video-generator-workflow", {
 
 | Component | Cost per Unit | Typical Usage |
 |-----------|---------------|---------------|
-| Nano Banana Pro | $0.15/image | 6-10 images |
-| Hailuo 2.3 | ~$0.08/second | 60-90 seconds |
-| Total | ~$6-10 | Per 60s video |
+| Gemini Flash Image | ~$0.039/image | 6-10 images |
+| Imagen 4 | ~$0.04/image | 6-10 images |
+| Google Veo 3.1 | ~$0.05/second | 48-64 seconds (8s clips) |
+| Total | ~$3-5 | Per 60s video |

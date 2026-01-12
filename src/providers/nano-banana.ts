@@ -1,6 +1,16 @@
-import { NanoBananaRequest, NanoBananaResponse, VideoStyle, AspectRatio } from '../types';
+import { VideoStyle, AspectRatio } from '../types';
+import * as fs from 'fs/promises';
 
-const FAL_API_URL = 'https://fal.run/fal-ai/nano-banana-pro';
+// Google Gemini API for Nano Banana (Gemini 2.5 Flash Image / Gemini 3 Pro Image)
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+// Model options - Nano Banana is Gemini's image generation capability
+const MODELS = {
+  nanoBanana: 'gemini-2.0-flash-exp', // Gemini 2.5 Flash Image (Nano Banana)
+  gemini3Pro: 'gemini-3-pro-image',   // Gemini 3 Pro Image
+  imagen4: 'imagen-4.0-generate-001', // Imagen 4 via Vertex AI
+  imagen4Ultra: 'imagen-4.0-ultra-generate-001'
+};
 
 const STYLE_SUFFIXES: Record<VideoStyle, string> = {
   cinematic: 'cinematic lighting, film grain, shallow depth of field, 35mm film, dramatic composition, professional photography',
@@ -10,72 +20,154 @@ const STYLE_SUFFIXES: Record<VideoStyle, string> = {
 };
 
 const ASPECT_RATIO_MAP: Record<AspectRatio, string> = {
-  '16:9': 'landscape_16_9',
-  '9:16': 'portrait_16_9',
-  '1:1': 'square',
-  '4:5': 'portrait_4_3'
+  '16:9': '16:9',
+  '9:16': '9:16',
+  '1:1': '1:1',
+  '4:5': '4:5'
 };
+
+interface GeminiImageResponse {
+  candidates: Array<{
+    content: {
+      parts: Array<{
+        inlineData?: {
+          mimeType: string;
+          data: string;
+        };
+        text?: string;
+      }>;
+    };
+  }>;
+}
 
 export class NanoBananaProvider {
   private apiKey: string;
+  private model: string;
+  private projectId?: string;
 
-  constructor(apiKey?: string) {
-    this.apiKey = apiKey || process.env.FAL_KEY || '';
+  constructor(apiKey?: string, model?: string, projectId?: string) {
+    this.apiKey = apiKey || process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || '';
+    this.model = model || MODELS.nanoBanana;
+    this.projectId = projectId || process.env.GOOGLE_CLOUD_PROJECT;
+    
     if (!this.apiKey) {
-      throw new Error('FAL_KEY environment variable is required for Nano Banana Pro');
+      throw new Error('GOOGLE_API_KEY or GEMINI_API_KEY environment variable is required for Nano Banana');
     }
   }
 
   async generateImage(
     description: string,
     style: VideoStyle,
-    aspectRatio: AspectRatio = '16:9',
-    seed?: number
-  ): Promise<NanoBananaResponse> {
+    aspectRatio: AspectRatio = '16:9'
+  ): Promise<{ imageData: string; mimeType: string }> {
     const styleSuffix = STYLE_SUFFIXES[style];
-    const imageSize = ASPECT_RATIO_MAP[aspectRatio];
+    const prompt = `Generate a high-quality image: ${description}, ${styleSuffix}`;
     
-    const prompt = `${description}, ${styleSuffix}`;
+    console.log(`[NanoBanana] Generating image with Gemini: ${prompt.substring(0, 100)}...`);
+
+    const url = `${GEMINI_API_URL}/${this.model}:generateContent?key=${this.apiKey}`;
     
-    const request: NanoBananaRequest = {
-      prompt,
-      image_size: imageSize,
-      num_images: 1,
-      ...(seed && { seed })
-    };
-
-    console.log(`[NanoBanana] Generating image with prompt: ${prompt.substring(0, 100)}...`);
-
-    const response = await fetch(FAL_API_URL, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Key ${this.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(request)
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          responseModalities: ['image', 'text'],
+          imageDimension: aspectRatio === '9:16' ? '768x1344' : 
+                          aspectRatio === '1:1' ? '1024x1024' :
+                          aspectRatio === '4:5' ? '896x1120' : '1344x768'
+        }
+      })
     });
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Nano Banana Pro API error: ${response.status} - ${error}`);
+      throw new Error(`Gemini API error: ${response.status} - ${error}`);
     }
 
-    const result = await response.json() as NanoBananaResponse;
-    console.log(`[NanoBanana] Image generated successfully`);
+    const result = await response.json() as GeminiImageResponse;
     
-    return result;
+    // Extract image from response
+    for (const candidate of result.candidates || []) {
+      for (const part of candidate.content?.parts || []) {
+        if (part.inlineData) {
+          console.log(`[NanoBanana] Image generated successfully`);
+          return {
+            imageData: part.inlineData.data,
+            mimeType: part.inlineData.mimeType
+          };
+        }
+      }
+    }
+
+    throw new Error('No image returned from Gemini API');
   }
 
-  async downloadImage(url: string, outputPath: string): Promise<string> {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to download image: ${response.status}`);
+  async generateImageWithImagen(
+    description: string,
+    style: VideoStyle,
+    aspectRatio: AspectRatio = '16:9'
+  ): Promise<{ imageData: string; mimeType: string }> {
+    // Imagen 4 via Vertex AI
+    if (!this.projectId) {
+      throw new Error('GOOGLE_CLOUD_PROJECT required for Imagen');
     }
 
-    const buffer = await response.arrayBuffer();
-    const fs = await import('fs/promises');
-    await fs.writeFile(outputPath, Buffer.from(buffer));
+    const styleSuffix = STYLE_SUFFIXES[style];
+    const prompt = `${description}, ${styleSuffix}`;
     
+    const url = `https://${process.env.GOOGLE_CLOUD_REGION || 'us-central1'}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${process.env.GOOGLE_CLOUD_REGION || 'us-central1'}/publishers/google/models/imagen-4.0-generate-001:predict`;
+    
+    console.log(`[Imagen4] Generating image: ${prompt.substring(0, 100)}...`);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        instances: [{
+          prompt: prompt
+        }],
+        parameters: {
+          sampleCount: 1,
+          aspectRatio: ASPECT_RATIO_MAP[aspectRatio],
+          outputOptions: {
+            mimeType: 'image/png'
+          }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Imagen API error: ${response.status} - ${error}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.predictions?.[0]?.bytesBase64Encoded) {
+      console.log(`[Imagen4] Image generated successfully`);
+      return {
+        imageData: result.predictions[0].bytesBase64Encoded,
+        mimeType: 'image/png'
+      };
+    }
+
+    throw new Error('No image returned from Imagen API');
+  }
+
+  async saveImage(imageData: string, mimeType: string, outputPath: string): Promise<string> {
+    const buffer = Buffer.from(imageData, 'base64');
+    await fs.writeFile(outputPath, buffer);
     console.log(`[NanoBanana] Image saved to: ${outputPath}`);
     return outputPath;
   }
@@ -85,23 +177,25 @@ export class NanoBananaProvider {
     sceneMood: string,
     style: VideoStyle,
     aspectRatio: AspectRatio,
-    outputPath: string,
-    seed?: number
+    outputPath: string
   ): Promise<string> {
     const fullDescription = `${sceneDescription}, ${sceneMood} atmosphere`;
     
-    const result = await this.generateImage(fullDescription, style, aspectRatio, seed);
-    
-    if (!result.images || result.images.length === 0) {
-      throw new Error('No images returned from Nano Banana Pro');
+    // Try Gemini Nano Banana first, fall back to Imagen if needed
+    try {
+      const result = await this.generateImage(fullDescription, style, aspectRatio);
+      return this.saveImage(result.imageData, result.mimeType, outputPath);
+    } catch (error) {
+      console.warn(`[NanoBanana] Gemini failed, trying Imagen: ${error}`);
+      const result = await this.generateImageWithImagen(fullDescription, style, aspectRatio);
+      return this.saveImage(result.imageData, result.mimeType, outputPath);
     }
-
-    await this.downloadImage(result.images[0].url, outputPath);
-    return outputPath;
   }
 
   getEstimatedCost(imageCount: number): number {
-    return imageCount * 0.15;
+    // Gemini 2.5 Flash Image: ~$0.039 per image
+    // Imagen 4: $0.04 per image
+    return imageCount * 0.04;
   }
 }
 
@@ -112,11 +206,5 @@ export async function generateImage(
   outputPath: string
 ): Promise<string> {
   const provider = new NanoBananaProvider();
-  const result = await provider.generateImage(description, style, aspectRatio);
-  
-  if (!result.images || result.images.length === 0) {
-    throw new Error('No images returned');
-  }
-
-  return provider.downloadImage(result.images[0].url, outputPath);
+  return provider.generateSceneImage(description, '', style, aspectRatio, outputPath);
 }

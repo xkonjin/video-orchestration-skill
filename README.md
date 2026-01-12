@@ -1,9 +1,9 @@
 # Video Orchestration Skill
 
-AI-powered long-form video generation using Claude as an orchestration agent. Create complete videos from a single text prompt by combining:
+AI-powered long-form video generation using Claude as an orchestration agent. Create complete videos from a single text prompt by combining Google's AI tools:
 
-- **Nano Banana Pro** (fal.ai) - High-quality image generation with text rendering
-- **Hailuo 2.3** (MiniMax) - AI video generation from images
+- **Gemini Nano Banana / Imagen 4** - High-quality image generation with text rendering
+- **Google Veo 3.1** - AI video generation from images (image-to-video)
 - **ffmpeg** - Video assembly, transitions, and audio mixing
 - **Glif** (optional) - Pre-built visual workflow pipelines
 
@@ -13,9 +13,9 @@ AI-powered long-form video generation using Claude as an orchestration agent. Cr
 # Install dependencies
 npm install
 
-# Set up API keys
-export FAL_KEY="your_fal_ai_key"
-export MINIMAX_API_KEY="your_minimax_key"
+# Set up API keys (Google Cloud)
+export GOOGLE_API_KEY="your_google_api_key"
+export GOOGLE_CLOUD_PROJECT="your_gcp_project_id"
 
 # Generate a video
 npm run create "A cozy bookstore that doubles as a coffee shop"
@@ -26,13 +26,13 @@ npm run create "A cozy bookstore that doubles as a coffee shop"
 ```
 ┌─────────────────┐     ┌──────────────┐     ┌─────────────┐     ┌──────────┐     ┌─────────┐
 │  User Prompt    │ ──► │  Storyboard  │ ──► │   Images    │ ──► │  Clips   │ ──► │  Final  │
-│                 │     │   (Claude)   │     │(Nano Banana)│     │ (Hailuo) │     │ (ffmpeg)│
+│                 │     │   (Claude)   │     │(Gemini/Img4)│     │  (Veo)   │     │ (ffmpeg)│
 └─────────────────┘     └──────────────┘     └─────────────┘     └──────────┘     └─────────┘
 ```
 
 1. **Storyboard**: Claude breaks your concept into cinematic scenes
-2. **Image Generation**: Nano Banana Pro creates high-quality images for each scene
-3. **Video Animation**: Hailuo 2.3 animates images into video clips with camera motion
+2. **Image Generation**: Gemini Nano Banana / Imagen 4 creates high-quality images for each scene
+3. **Video Animation**: Google Veo 3.1 animates images into video clips with camera motion
 4. **Assembly**: ffmpeg stitches clips together with transitions and audio
 
 ## Installation
@@ -47,13 +47,14 @@ npm install
 
 - Node.js 18+
 - ffmpeg installed and in PATH
-- API keys for fal.ai and MiniMax
+- Google Cloud project with Vertex AI enabled
+- Google API key or service account credentials
 
 ### API Keys
 
 Get your API keys:
-- **fal.ai** (Nano Banana Pro): https://fal.ai/dashboard/keys
-- **MiniMax** (Hailuo): https://platform.minimax.chat/
+- **Google AI Studio** (Gemini): https://aistudio.google.com/apikey
+- **Google Cloud Console** (Vertex AI/Veo): https://console.cloud.google.com/apis/credentials
 
 ## Usage
 
@@ -147,9 +148,10 @@ output/
 
 | Component | Cost | Notes |
 |-----------|------|-------|
-| Nano Banana Pro | $0.15/image | ~6 images for 60s video |
-| Hailuo 2.3 | ~$0.08/second | 60s = ~$4.80 |
-| **Total** | **~$6-10** | Per 60-second video |
+| Gemini Flash Image | ~$0.039/image | ~6 images for 60s video |
+| Imagen 4 | ~$0.04/image | Alternative image model |
+| Google Veo 3.1 | ~$0.05/second | 48-64s (8s clips) |
+| **Total** | **~$3-5** | Per 60-second video |
 
 ## Examples
 
