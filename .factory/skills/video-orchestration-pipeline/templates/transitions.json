@@ -1,0 +1,128 @@
+{
+  "transitions": {
+    "fade": {
+      "name": "Crossfade",
+      "description": "Classic smooth crossfade between clips",
+      "ffmpeg_filter": "xfade=transition=fade",
+      "best_for": ["cinematic", "emotional", "professional"],
+      "default_duration": 0.5
+    },
+    "dissolve": {
+      "name": "Dissolve",
+      "description": "Soft dissolve with slight blur",
+      "ffmpeg_filter": "xfade=transition=dissolve",
+      "best_for": ["artistic", "dreamy", "nostalgic"],
+      "default_duration": 0.75
+    },
+    "wipeleft": {
+      "name": "Wipe Left",
+      "description": "New scene wipes in from the right",
+      "ffmpeg_filter": "xfade=transition=wipeleft",
+      "best_for": ["dynamic", "energetic", "modern"],
+      "default_duration": 0.3
+    },
+    "wiperight": {
+      "name": "Wipe Right",
+      "description": "New scene wipes in from the left",
+      "ffmpeg_filter": "xfade=transition=wiperight",
+      "best_for": ["dynamic", "energetic", "modern"],
+      "default_duration": 0.3
+    },
+    "slideup": {
+      "name": "Slide Up",
+      "description": "New scene slides up from bottom",
+      "ffmpeg_filter": "xfade=transition=slideup",
+      "best_for": ["social", "vertical", "mobile"],
+      "default_duration": 0.25
+    },
+    "slidedown": {
+      "name": "Slide Down",
+      "description": "New scene slides down from top",
+      "ffmpeg_filter": "xfade=transition=slidedown",
+      "best_for": ["social", "vertical", "reveal"],
+      "default_duration": 0.25
+    },
+    "circleopen": {
+      "name": "Circle Open",
+      "description": "New scene reveals through expanding circle",
+      "ffmpeg_filter": "xfade=transition=circleopen",
+      "best_for": ["creative", "playful", "highlight"],
+      "default_duration": 0.5
+    },
+    "circleclose": {
+      "name": "Circle Close",
+      "description": "Current scene closes to circle, revealing new scene",
+      "ffmpeg_filter": "xfade=transition=circleclose",
+      "best_for": ["endings", "focus", "dramatic"],
+      "default_duration": 0.5
+    },
+    "slideleft": {
+      "name": "Slide Left",
+      "description": "Current scene slides left, new scene enters",
+      "ffmpeg_filter": "xfade=transition=slideleft",
+      "best_for": ["timeline", "progression", "sequence"],
+      "default_duration": 0.3
+    },
+    "slideright": {
+      "name": "Slide Right",
+      "description": "Current scene slides right, new scene enters",
+      "ffmpeg_filter": "xfade=transition=slideright",
+      "best_for": ["timeline", "progression", "sequence"],
+      "default_duration": 0.3
+    },
+    "smoothleft": {
+      "name": "Smooth Left",
+      "description": "Smooth blend moving left",
+      "ffmpeg_filter": "xfade=transition=smoothleft",
+      "best_for": ["elegant", "professional", "corporate"],
+      "default_duration": 0.5
+    },
+    "smoothright": {
+      "name": "Smooth Right",
+      "description": "Smooth blend moving right",
+      "ffmpeg_filter": "xfade=transition=smoothright",
+      "best_for": ["elegant", "professional", "corporate"],
+      "default_duration": 0.5
+    },
+    "rectcrop": {
+      "name": "Rectangle Crop",
+      "description": "Rectangular reveal transition",
+      "ffmpeg_filter": "xfade=transition=rectcrop",
+      "best_for": ["modern", "geometric", "tech"],
+      "default_duration": 0.4
+    },
+    "distance": {
+      "name": "Distance",
+      "description": "Color distance based transition",
+      "ffmpeg_filter": "xfade=transition=distance",
+      "best_for": ["abstract", "artistic", "unique"],
+      "default_duration": 0.5
+    },
+    "fadeblack": {
+      "name": "Fade Through Black",
+      "description": "Fade out to black, then fade in new scene",
+      "ffmpeg_filter": "xfade=transition=fadeblack",
+      "best_for": ["dramatic", "chapter_break", "emotional"],
+      "default_duration": 1.0
+    },
+    "fadewhite": {
+      "name": "Fade Through White",
+      "description": "Fade out to white, then fade in new scene",
+      "ffmpeg_filter": "xfade=transition=fadewhite",
+      "best_for": ["bright", "heavenly", "flashback"],
+      "default_duration": 1.0
+    }
+  },
+  "style_recommendations": {
+    "cinematic": ["fade", "dissolve", "fadeblack"],
+    "commercial": ["fade", "smoothleft", "smoothright"],
+    "artistic": ["dissolve", "distance", "circleopen"],
+    "social": ["wipeleft", "slideup", "slideleft"]
+  },
+  "aspect_ratio_recommendations": {
+    "16:9": ["fade", "wipeleft", "dissolve", "smoothleft"],
+    "9:16": ["slideup", "slidedown", "fade", "wipeleft"],
+    "1:1": ["fade", "circleopen", "dissolve"],
+    "4:5": ["fade", "slideup", "dissolve"]
+  }
+}

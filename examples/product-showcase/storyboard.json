@@ -1,0 +1,53 @@
+{
+  "title": "Luxury Watch Collection - Timeless Elegance",
+  "duration_seconds": 45,
+  "style": "commercial",
+  "aspect_ratio": "16:9",
+  "scenes": [
+    {
+      "id": 1,
+      "name": "dramatic_reveal",
+      "duration": 8,
+      "description": "Luxury watch emerging from darkness, dramatic spotlight illuminating polished stainless steel case, sapphire crystal catching light, deep black background, particles of light floating, high-end product photography, extreme attention to detail",
+      "camera_motion": "slow_zoom_in",
+      "mood": "dramatic, luxurious, anticipation"
+    },
+    {
+      "id": 2,
+      "name": "dial_detail",
+      "duration": 8,
+      "description": "Extreme close-up of watch dial showing intricate guilloche pattern, applied hour markers in polished gold, elegant dauphine hands, subtle sunburst finish catching light, macro photography revealing craftsmanship, Swiss precision",
+      "camera_motion": "orbit",
+      "mood": "precision, craftsmanship, excellence"
+    },
+    {
+      "id": 3,
+      "name": "movement_showcase",
+      "duration": 8,
+      "description": "Exhibition caseback revealing automatic movement, decorated rotor with Geneva stripes, polished jewels catching light, intricate gears in motion, mechanical poetry, transparent view of horological art",
+      "camera_motion": "slow_zoom_in",
+      "mood": "mechanical beauty, heritage, engineering marvel"
+    },
+    {
+      "id": 4,
+      "name": "lifestyle_wrist",
+      "duration": 8,
+      "description": "Watch on elegant wrist, tailored suit sleeve visible, sophisticated setting suggesting success, natural light from window, subtle reflection on polished case, aspirational lifestyle photography, confidence and achievement",
+      "camera_motion": "pan_right",
+      "mood": "aspirational, success, sophisticated lifestyle"
+    },
+    {
+      "id": 5,
+      "name": "hero_shot_close",
+      "duration": 8,
+      "description": "Final hero shot of complete watch at three-quarter angle, perfect lighting showing all design elements, leather strap texture visible, brand logo crisp and clear, deep shadows and highlights, ultimate product photography, luxury aesthetic",
+      "camera_motion": "slow_zoom_out",
+      "mood": "desire, timeless elegance, closing impact"
+    }
+  ],
+  "audio": {
+    "music_style": "minimal elegant piano with subtle orchestral swells",
+    "ambient": "soft mechanical ticking, subtle atmospheric tones"
+  },
+  "created_at": "2026-01-12T00:00:00.000Z"
+}

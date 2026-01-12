@@ -1,0 +1,54 @@
+{
+  "name": "video-orchestration-skill",
+  "version": "1.0.0",
+  "description": "AI-powered long-form video generation using Claude orchestration with Nano Banana Pro, Hailuo 2, and ffmpeg",
+  "main": "dist/orchestrator.js",
+  "types": "dist/orchestrator.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/orchestrator.js",
+    "dev": "ts-node src/orchestrator.ts",
+    "create": "ts-node src/orchestrator.ts create",
+    "storyboard": "ts-node src/orchestrator.ts storyboard",
+    "generate-images": "ts-node src/orchestrator.ts generate-images",
+    "animate": "ts-node src/orchestrator.ts animate",
+    "assemble": "ts-node src/orchestrator.ts assemble",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "jest"
+  },
+  "keywords": [
+    "ai",
+    "video-generation",
+    "nano-banana-pro",
+    "hailuo",
+    "minimax",
+    "ffmpeg",
+    "claude",
+    "orchestration",
+    "factory-skill"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@fal-ai/client": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/video-orchestration-skill.git"
+  }
+}

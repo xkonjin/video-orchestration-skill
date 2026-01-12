@@ -1,0 +1,61 @@
+{
+  "title": "Books & Brews - Where Stories Meet Coffee",
+  "duration_seconds": 60,
+  "style": "cinematic",
+  "aspect_ratio": "16:9",
+  "scenes": [
+    {
+      "id": 1,
+      "name": "exterior_evening",
+      "duration": 10,
+      "description": "Charming brick bookstore exterior with large bay windows glowing warmly, vintage wooden sign reading 'Books & Brews' with decorative coffee cup and book icons, autumn evening with golden hour light, fallen leaves on cobblestone sidewalk, warm inviting glow from within",
+      "camera_motion": "slow_zoom_in",
+      "mood": "warm, inviting, magical"
+    },
+    {
+      "id": 2,
+      "name": "entrance_welcome",
+      "duration": 10,
+      "description": "Cozy entrance interior with exposed brick walls, hand-written chalkboard menu listing coffee specialties and book recommendations, potted ferns and succulents, comfortable vintage leather seating visible beyond, soft warm lighting from Edison bulbs, welcoming atmosphere",
+      "camera_motion": "dolly_forward",
+      "mood": "welcoming, cozy, intimate"
+    },
+    {
+      "id": 3,
+      "name": "bookshelf_exploration",
+      "duration": 10,
+      "description": "Floor-to-ceiling oak wooden bookshelves filled with colorful book spines, antique rolling ladder with brass fittings, cozy reading nooks with plush armchairs tucked between shelves, warm afternoon sunlight streaming through tall windows, dust particles floating in light beams",
+      "camera_motion": "pan_right",
+      "mood": "wonder, discovery, literary magic"
+    },
+    {
+      "id": 4,
+      "name": "coffee_bar_craft",
+      "duration": 10,
+      "description": "Artisan coffee bar with gleaming copper La Marzocco espresso machine, displayed pastries and fresh baked goods under glass domes, skilled barista hands carefully crafting intricate latte art rosetta, steam rising beautifully, warm ambient lighting from pendant lamps",
+      "camera_motion": "orbit",
+      "mood": "artisanal, craft, sensory delight"
+    },
+    {
+      "id": 5,
+      "name": "reading_nook_peace",
+      "duration": 10,
+      "description": "Perfect cozy reading corner with deep plush velvet armchair in forest green, soft knit blanket draped over arm, steaming ceramic cup of coffee on wooden side table, open vintage book with beautiful typography, soft warm lamp light, gentle rain visible through nearby window",
+      "camera_motion": "slow_zoom_in",
+      "mood": "peaceful, content, hygge perfection"
+    },
+    {
+      "id": 6,
+      "name": "closing_brand",
+      "duration": 10,
+      "description": "Artistic tabletop composition of ceramic coffee cup with beautiful latte art heart beside elegantly open book, 'Books & Brews' logo subtly embossed on napkin, warm golden hour lighting creating gentle shadows, cozy blurred bookshelf bokeh in background, steam rising artistically",
+      "camera_motion": "slow_zoom_out",
+      "mood": "memorable, aspirational, brand connection"
+    }
+  ],
+  "audio": {
+    "music_style": "soft acoustic guitar with gentle piano, lo-fi warm tones",
+    "ambient": "quiet cafe sounds, espresso machine hum, turning pages, gentle rain"
+  },
+  "created_at": "2026-01-12T00:00:00.000Z"
+}
